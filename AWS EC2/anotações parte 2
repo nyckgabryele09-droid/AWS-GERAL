@@ -1,0 +1,149 @@
+# Visão geral do laboratório
+diagrama de arquitetura
+
+Nesta atividade prática, você criará uma função do AWS Lambda. Você também criará um evento do Amazon EventBridge para acionar a função a cada minuto. A função usa uma função do AWS Identity and Access Management (IAM). Essa função do IAM permite que a função do Lambda interrompa uma instância do Amazon Elastic Compute Cloud (Amazon EC2) sendo executada na conta da Amazon Web Services (AWS).
+
+Duração
+A atividade levará aproximadamente 30 minutos para ser concluída.
+
+Restrições de serviço da AWS
+Neste ambiente de laboratório, o acesso aos serviços e às ações de serviços da AWS pode ser restrito aos necessários para concluir as instruções do laboratório. Você poderá encontrar erros se tentar acessar outros serviços ou executar ações além das descritas neste laboratório.
+
+Acessar o Console de Gerenciamento da AWS
+No topo destas instruções, escolha  Iniciar laboratório.
+
+A sessão de laboratório será iniciada.
+
+Um cronômetro ficará visível no topo da página e mostrará o tempo restante da sessão.
+
+ Dica: para atualizar a duração da sessão a qualquer momento, selecione  Iniciar laboratório novamente antes que o cronômetro seja zerado.
+
+Antes de continuar, aguarde até o ícone circular à direita do link da AWS  no canto superior esquerdo ficar verde. 
+
+Para se conectar ao Console de Gerenciamento da AWS, escolha o link da AWS no canto superior esquerdo.
+
+Uma nova guia do navegador será aberta, e você acessará o console.
+
+ Dica: se uma nova guia não for aberta, você verá um banner ou um ícone no topo do navegador com uma mensagem informando que o programa está impedindo que o site abra janelas pop-up. Selecione o banner ou ícone e escolha Permitir pop-ups.
+
+Organize a guia do Console de Gerenciamento da AWS para que ela seja exibida com essas instruções. O ideal seria você poder visualizar as duas guias do navegador ao mesmo tempo para facilitar o acompanhamento das etapas do laboratório.
+
+Como obter crédito para seu trabalho
+Ao final deste laboratório, você receberá instruções de como enviar o laboratório para receber uma pontuação com base em seu progresso.
+
+ Dica: o script que verifica seu trabalho só pode conceder pontos se você nomear recursos e definir as configurações conforme especificado. Em particular, os valores nessas instruções que aparecem This Format devem ser inseridos exatamente como documentado (diferenciando letras maiúsculas de minúsculas).
+
+Tarefa 1: Criar uma função do Lambda
+Na caixa de pesquisa à direita de  Serviços, procure e selecione EC2 para abrir o console do AWS Lambda.
+
+Escolha Criar uma função.
+
+Na tela Criar função, defina estas configurações:
+
+Escolha Criar do zero.
+
+Nome da função: myStopinator
+
+Runtime: Python 3.11
+
+Selecione Alterar a função de execução padrão
+
+Função de execução: Usar uma função existente
+
+Função existente: na lista suspensa, escolha myStopinatorRole
+
+Escolha Criar função.
+
+Tarefa 2: Configurar o gatilho
+Nesta tarefa, você configurará um evento programado para acionar a função do Lambda definindo um evento do Amazon EventBridge como a fonte (ou gatilho) do evento. É possível configurar a função do Lambda para operar de forma muito semelhante a um trabalho cron em um servidor Linux ou a uma tarefa programada em um servidor Microsoft Windows. No entanto, você não precisa ter um servidor em execução para hospedá-la.
+
+Selecione Adicionar trigger.
+
+Escolha no menu suspenso Selecione um gatilho e selecione EventBridge (CloudWatch Events).
+
+Para a regra, escolha Criar uma nova regra e defina estas configurações:
+
+Nome da regra: everyMinute
+Tipo de regra: Expressão de programação
+Expressão de programação: rate(1 minute)
+Observação: uma função do Lambda stopinator mais realista e baseada na programação provavelmente seria acionada usando uma expressão cron, em vez de uma expressão rate. No entanto, para a finalidade desta atividade, o uso de uma expressão rate garante que a função do Lambda seja acionada rapidamente para que você possa ver os resultados.
+
+Selecione Adicionar.
+
+Tarefa 3: Configurar a função do Lambda
+Nesta tarefa, você colará algumas linhas de código para atualizar dois valores no código da função. Você não precisa escrever nenhum código para concluir esta tarefa.
+
+Abaixo do painel Visão geral da função, escolha Código e selecione lambda_function.py para exibir e editar o código da função do Lambda. 
+
+No painel Origem do código, exclua o código existente. Copie o código a seguir e cole-o na caixa:
+
+import boto3
+region = '<REPLACE_WITH_REGION>'
+instances = ['<REPLACE_WITH_INSTANCE_ID>']
+ec2 = boto3.client('ec2', region_name=region)
+
+def lambda_handler(event, context):
+    ec2.stop_instances(InstanceIds=instances)
+    print('stopped your instances: ' + str(instances))
+Observação: após colar o código na caixa Origem do código, revise a linha cinco. Se houver um ponto (.), exclua-o.
+
+Substitua o espaço reservado <REPLACE_WITH_REGION> pela Região real que você está usando. Para fazer isso:
+
+Selecione a Região no canto superior direito e use o código da Região. Por exemplo, o código da Região Leste dos EUA (Norte da Virgínia) é us-east-1.
+
+Importante: mantenha a Região entre aspas simples (' ') no código. Por exemplo, para Norte da Virgínia, seria 'us-east-1'
+
+Seção de desafio: confirme se uma instância do EC2 chamada instance1 está em execução em sua conta e copie o ID da instância da instance1.  
+
+Desafiamos você a descobrir como realizar essa tarefa sem uma orientação passo a passo específica. No entanto, se você precisar de orientação detalhada, selecione este texto para revelar as etapas detalhadas:
+ 
+Retorne à guia do navegador do console do AWS Lambda e substitua <REPLACE_WITH_INSTANCE_ID> pelo ID da instância real que você acabou de copiar.
+
+Importante: mantenha o ID da instância entre aspas simples (' ') no código.
+
+Seu código agora deve ser semelhante ao exemplo a seguir. No entanto, você pode ter um valor diferente para a região e terá um valor diferente para o ID da instância:
+
+diagrama de arquitetura
+
+Escolha o menu Arquivo e selecione Salvar para fazer as alterações. Depois, na caixa Origem do código, selecione Implantar.
+
+Sua função do Lambda agora está totalmente configurada. Ela deve tentar interromper sua instância a cada minuto.
+
+Selecione Monitorar (a guia próxima ao topo da página).
+
+Observe que um dos gráficos mostra quantas vezes a função foi invocada. Há também um gráfico que mostra a contagem de erros e a taxa de sucesso como porcentagem.
+
+Tarefa 4: Verificar se a função do Lambda funcionou
+Retorne à guia do navegador do console do Amazon EC2 e confira se a instância foi interrompida.
+
+Dica: você pode clicar no ícone de atualização  ou atualizar a página do navegador para ver a alteração no estado mais rapidamente.
+
+Tente iniciar a instância novamente. O que você acha que vai acontecer?
+
+Clique aqui para revelar a resposta.
+ 
+Envio do trabalho
+Para registrar seu progresso, selecione Enviar no topo destas instruções.
+
+Quando solicitado, selecione Sim.
+
+Depois de alguns minutos, o painel de notas é exibido e mostra quantos pontos você obteve em cada tarefa. Se os resultados não forem exibidos após alguns minutos, selecione Notas no topo destas instruções.
+
+  Importante:  algumas das verificações feitas no processo de envio deste laboratório só fornecerão crédito a você pelo menos cinco minutos após a conclusão da ação. Se você não receber crédito no primeiro envio, aguarde alguns minutos e envie novamente para receber crédito por esses itens. 
+
+ Dica: você pode enviar seu trabalho várias vezes. Depois de fazer as alterações, selecione Enviar novamente. Seu último envio é registrado para o laboratório.
+
+Para ver o feedback detalhado sobre seu trabalho, selecione Relatório de envio.
+
+ Dica: se você não tiver recebido a pontuação total em alguma verificação, poderá haver detalhes úteis no relatório de envio.
+
+Atividade concluída
+ Parabéns! Você concluiu a atividade.
+
+Selecione Encerrar laboratório no topo da página e Sim para confirmar que você deseja encerrar a atividade.  
+
+Um painel é exibido com a mensagem: DELETE has been initiated... You may close this message box now (A EXCLUSÃO foi iniciada… Você pode fechar esta caixa de mensagem agora).
+
+Para fechar o painel, selecione o X no canto superior direito.
+
+ 
