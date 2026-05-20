@@ -1,0 +1,41 @@
+# Loja de Sapatos 
+
+Projeto simples de e-commerce de sapatos desenvolvido com:
+
+- HTML
+- CSS
+- JavaScript
+- Node.js
+
+
+O sistema possui uma API própria que fornece os dados dos produtos e um front-end responsável por consumir essas informações.
+
+---
+
+# Objetivo do Projeto
+
+Criar uma aplicação web de uma loja de sapatos contendo:
+
+✅ API própria
+
+✅ Interface responsiva
+
+✅ Consumo de API
+
+✅ Estrutura simples e organizada
+
+✅ Compatibilidade com PC e celular
+
+---
+
+# Estrutura do Projeto
+
+```bash
+projeto-sapatos/
+│
+├── index.html
+├── style.css
+├── script.js
+├── server.js
+├── package.json
+└── README.md
